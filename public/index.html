@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>開発日誌</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #08090c; --surface: #0f1116; --card: #12141c;
+      --border: #1c1f2e; --border2: #252838;
+      --text: #dde0f0; --muted: #858ab0; --dim: #515573;
+      --accent: #d4a030; --accent-l: rgba(212,160,48,.1); --accent-b: rgba(212,160,48,.22);
+      --teal: #30c8a8; --coral: #e06858; --green: #38c078;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Space Grotesk', sans-serif;
+      background: var(--bg); color: var(--text);
+      min-height: 100vh; padding: 40px 20px 60px;
+    }
+    .wrap { max-width: 640px; margin: 0 auto; }
+    .hd { display: flex; align-items: center; justify-content: space-between; margin-bottom: 32px; }
+    .hd a { font-size: .78rem; color: var(--dim); text-decoration: none; }
+    .hd a:hover { color: var(--muted); }
+    h1 { font-size: 1.3rem; font-weight: 700; letter-spacing: -.02em; }
+    .h1-sub { font-family: 'JetBrains Mono', monospace; font-size: .62rem; color: var(--dim); margin-top: 3px; }
+
+    /* Form */
+    .form-card {
+      background: var(--card); border: 1px solid var(--accent-b);
+      border-radius: 14px; padding: 18px 20px; margin-bottom: 24px;
+    }
+    .form-row { display: flex; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; }
+    select, textarea, input {
+      font-family: 'Space Grotesk', sans-serif; font-size: .85rem;
+      background: var(--surface); border: 1px solid var(--border2);
+      color: var(--text); border-radius: 7px; outline: none;
+      transition: border-color .15s;
+    }
+    select:focus, textarea:focus { border-color: var(--accent); }
+    select { padding: .45rem .75rem; cursor: pointer; }
+    .author-select { padding: .45rem .75rem; }
+    textarea {
+      width: 100%; padding: .6rem .85rem; resize: vertical;
+      min-height: 80px; line-height: 1.6;
+    }
+    .form-actions { display: flex; justify-content: flex-end; margin-top: 10px; }
+    .btn {
+      font-family: 'Space Grotesk', sans-serif; font-size: .82rem; font-weight: 600;
+      padding: .45rem 1.1rem; border-radius: 7px; border: none; cursor: pointer;
+      transition: opacity .15s;
+    }
+    .btn:hover { opacity: .85; }
+    .btn-primary { background: var(--accent); color: #08090c; }
+    .btn-ghost { background: var(--surface); border: 1px solid var(--border2); color: var(--muted); }
+
+    /* Entries */
+    .entries { display: flex; flex-direction: column; gap: 10px; }
+    .entry {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 12px; padding: 16px 18px;
+      transition: border-color .15s;
+    }
+    .entry:hover { border-color: var(--border2); }
+    .entry-hd { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; }
+    .app-badge {
+      font-family: 'Space Grotesk', sans-serif; font-size: .76rem; font-weight: 600;
+      padding: 3px 10px; border-radius: 99px;
+      background: color-mix(in srgb, var(--c) 16%, transparent);
+      border: 1px solid color-mix(in srgb, var(--c) 50%, transparent);
+      color: var(--c);
+    }
+    .author-badge {
+      font-family: 'JetBrains Mono', monospace; font-size: .62rem; font-weight: 500;
+      padding: 2px 7px; border-radius: 99px;
+    }
+    .badge-claude { background: var(--accent-l); border: 1px solid var(--accent-b); color: var(--accent); }
+    .badge-manual { background: rgba(48,200,168,.08); border: 1px solid rgba(48,200,168,.2); color: var(--teal); }
+    .entry-date {
+      font-family: 'JetBrains Mono', monospace; font-size: .62rem;
+      color: var(--dim); margin-left: auto;
+    }
+
+    /* Filter bar */
+    .filter-bar { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
+    .chip {
+      font-family: 'Space Grotesk', sans-serif; font-size: .76rem; font-weight: 500;
+      background: var(--surface); border: 1px solid var(--border2); color: var(--muted);
+      padding: 4px 10px; border-radius: 99px; cursor: pointer; transition: all .15s;
+      display: inline-flex; align-items: center; gap: 5px;
+    }
+    .chip:hover { border-color: var(--c, var(--border2)); color: var(--text); }
+    .chip.active {
+      background: color-mix(in srgb, var(--c, var(--accent)) 18%, transparent);
+      border-color: color-mix(in srgb, var(--c, var(--accent)) 55%, transparent);
+      color: var(--c, var(--accent));
+    }
+    .chip-n { font-family: 'JetBrains Mono', monospace; font-size: .64rem; opacity: .75; }
+    .entry-body { font-size: .875rem; color: #bcc0d4; line-height: 1.7; white-space: pre-wrap; }
+    .entry-del {
+      background: none; border: none; color: var(--dim); cursor: pointer;
+      font-size: .75rem; padding: 2px 6px; border-radius: 4px;
+      margin-left: 4px; transition: color .15s;
+    }
+    .entry-del:hover { color: var(--coral); }
+    .empty { text-align: center; padding: 3rem; color: var(--dim); font-size: .85rem; }
+    .count-lbl {
+      font-family: 'JetBrains Mono', monospace; font-size: .6rem;
+      color: var(--dim); margin-bottom: 12px;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="hd">
+      <div>
+        <h1>開発日誌</h1>
+        <div class="h1-sub">学びと作業ログの蓄積</div>
+      </div>
+      <a href="/">← ポータルへ</a>
+    </div>
+
+    <div class="form-card">
+      <div class="form-row">
+        <select id="appSel">
+          <option value="general">🗒 general</option>
+          <option value="portal">🏠 portal</option>
+          <option value="obsidian-sync">📝 obsidian-sync</option>
+          <option value="goma-monitor">🐾 goma-monitor</option>
+          <option value="marumie-jp">🔍 marumie-jp</option>
+          <option value="onepiece">🏴‍☠️ onepiece</option>
+          <option value="briefing-bot">📰 briefing-bot</option>
+          <option value="claude-usage">⚡ claude-usage</option>
+          <option value="agent-dashboard">👥 agent-dashboard</option>
+          <option value="task-manager">✅ task-manager</option>
+          <option value="deploy-infra">🛠 deploy-infra</option>
+        </select>
+        <select id="authorSel" class="author-select">
+          <option value="manual">✍️ 手入力</option>
+          <option value="claude">🤖 Claude</option>
+        </select>
+      </div>
+      <textarea id="content" placeholder="今日の作業・気づき・学び..."></textarea>
+      <div class="form-actions">
+        <button class="btn btn-primary" onclick="addEntry()">記録する</button>
+      </div>
+    </div>
+
+    <div class="filter-bar" id="filterBar"></div>
+    <div class="count-lbl" id="countLbl"></div>
+    <div class="entries" id="entries"><div class="empty">まだ記録がありません</div></div>
+  </div>
+
+  <script>
+    const BASE = '/diary';
+    let entries = [];
+    let currentFilter = null;
+
+    const APP_META = {
+      general:           { label: 'general',         icon: '🗒', color: '#858ab0' },
+      portal:            { label: 'portal',           icon: '🏠', color: '#d4a030' },
+      'obsidian-sync':   { label: 'obsidian-sync',    icon: '📝', color: '#9b8cff' },
+      'goma-monitor':    { label: 'goma-monitor',     icon: '🐾', color: '#e0a858' },
+      'marumie-jp':      { label: 'marumie-jp',       icon: '🔍', color: '#30c8a8' },
+      onepiece:          { label: 'onepiece',         icon: '🏴‍☠️', color: '#e06858' },
+      'one-piece':       { label: 'onepiece',         icon: '🏴‍☠️', color: '#e06858' },
+      'briefing-bot':    { label: 'briefing-bot',     icon: '📰', color: '#5aa9e6' },
+      'claude-usage':    { label: 'claude-usage',     icon: '⚡', color: '#f0d048' },
+      'agent-dashboard': { label: 'agent-dashboard',  icon: '👥', color: '#c084fc' },
+      'task-manager':    { label: 'task-manager',     icon: '✅', color: '#38c078' },
+      'deploy-infra':    { label: 'deploy-infra',     icon: '🛠', color: '#ff9f5a' },
+    };
+    const metaFor = app => APP_META[app] || { label: app, icon: '📦', color: '#515573' };
+
+    async function load() {
+      const res = await fetch(`${BASE}/api/entries`);
+      entries = await res.json();
+      render();
+    }
+
+    function setFilter(app) { currentFilter = app; render(); }
+
+    function renderFilterBar() {
+      const bar = document.getElementById('filterBar');
+      if (!entries.length) { bar.innerHTML = ''; return; }
+      const counts = {};
+      entries.forEach(e => { counts[e.app] = (counts[e.app] || 0) + 1; });
+      const apps = Object.keys(counts).sort((a, b) => counts[b] - counts[a]);
+      const allChip = `<button class="chip ${currentFilter === null ? 'active' : ''}" onclick="setFilter(null)">すべて <span class="chip-n">${entries.length}</span></button>`;
+      const appChips = apps.map(a => {
+        const m = metaFor(a);
+        return `<button class="chip ${currentFilter === a ? 'active' : ''}" style="--c:${m.color}" onclick="setFilter('${a}')">${m.icon} ${esc(m.label)} <span class="chip-n">${counts[a]}</span></button>`;
+      });
+      bar.innerHTML = [allChip, ...appChips].join('');
+    }
+
+    function render() {
+      renderFilterBar();
+      const filtered = currentFilter ? entries.filter(e => e.app === currentFilter) : entries;
+      const el = document.getElementById('entries');
+      document.getElementById('countLbl').textContent = filtered.length
+        ? `${filtered.length} 件${currentFilter ? '（絞り込み中）' : ''}`
+        : '';
+      if (!filtered.length) { el.innerHTML = `<div class="empty">${entries.length ? '該当する記録がありません' : 'まだ記録がありません'}</div>`; return; }
+      el.innerHTML = filtered.map(e => {
+        const m = metaFor(e.app);
+        return `
+        <div class="entry">
+          <div class="entry-hd">
+            <span class="app-badge" style="--c:${m.color}">${m.icon} ${esc(m.label)}</span>
+            <span class="author-badge ${e.author === 'claude' ? 'badge-claude' : 'badge-manual'}">${e.author === 'claude' ? '🤖 Claude' : '✍️ 手入力'}</span>
+            <span class="entry-date">${fmt(e.date)}</span>
+            <button class="entry-del" onclick="del('${e.id}')" title="削除">✕</button>
+          </div>
+          <div class="entry-body">${esc(e.content)}</div>
+        </div>`;
+      }).join('');
+    }
+
+    async function addEntry() {
+      const content = document.getElementById('content').value.trim();
+      if (!content) return;
+      await fetch(`${BASE}/api/entries`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ app: document.getElementById('appSel').value, content, author: document.getElementById('authorSel').value })
+      });
+      document.getElementById('content').value = '';
+      load();
+    }
+
+    async function del(id) {
+      if (!confirm('削除しますか？')) return;
+      await fetch(`${BASE}/api/entries/${id}`, { method: 'DELETE' });
+      load();
+    }
+
+    document.getElementById('content').addEventListener('keydown', e => {
+      if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) addEntry();
+    });
+
+    const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    const fmt = iso => {
+      const d = new Date(iso);
+      return d.toLocaleDateString('ja-JP', { timeZone: 'Asia/Tokyo', month: 'numeric', day: 'numeric' })
+        + ' ' + d.toLocaleTimeString('ja-JP', { timeZone: 'Asia/Tokyo', hour: '2-digit', minute: '2-digit' });
+    };
+
+    load();
+  </script>
+</body>
+</html>

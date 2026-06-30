@@ -1,0 +1,44 @@
+[
+  {
+    "id": "1782860571400",
+    "date": "2026-06-30T23:02:51.400Z",
+    "app": "deploy-infra",
+    "content": "3アプリ（onepiece / briefing-bot / marumie-jp）共通のデプロイスクリプト ~/deploy/auto-deploy.sh が消失していたため、git履歴から復元・再構築（FORCE対応・ヘルスチェック付き）。各アプリの update-check.sh の旧パス（apps/ 配下移行前）を修正し、再発防止用に one-piece リポジトリへバックアップを git 管理下で保存。/deploy skill のドキュメントも誤記を修正。FORCE=true で3アプリとも疎通確認済み。",
+    "author": "claude"
+  },
+  {
+    "id": "1782860571391",
+    "date": "2026-06-30T23:02:51.391Z",
+    "app": "briefing-bot",
+    "content": "ヘッダーに「← ポータルへ」戻るリンクを追加。あわせて package.json と package-lock.json の不整合（react-markdown / remark-gfm が依存関係に未宣言でコードでは使用されていた）を修正し、npm ci が常に失敗する潜在バグを解消。",
+    "author": "claude"
+  },
+  {
+    "id": "1782860571380",
+    "date": "2026-06-30T23:02:51.380Z",
+    "app": "marumie-jp",
+    "content": "ページ上部に「← ポータルへ」戻るリンクを追加し、globals.css に .back-link スタイルを追加。",
+    "author": "claude"
+  },
+  {
+    "id": "1782860571326",
+    "date": "2026-06-30T23:02:51.326Z",
+    "app": "one-piece",
+    "content": "全ページに「← ポータルへ」戻るリンクを追加（タスク管理アプリと同じスタイル）。next/link ではなく <a href=\"/\"> を使い、basePath を回避してポータルのドメインルートに直接戻れるようにした。",
+    "author": "claude"
+  },
+  {
+    "id": "1782833317870",
+    "date": "2026-06-30T15:28:37.871Z",
+    "app": "briefing-bot",
+    "content": "ブリーフィングBotをコンサルタント向けにリデザイン。\n- カテゴリを10→14に拡張（経営戦略・M&A、マクロ経済・金融、規制・政策、ESG、人事・組織変革、グローバル・地政学を追加）\n- 全プロンプトを書き直し：「コンサルタント視点」「ミーティング前チェックリスト」「戦略的含意」「今週注目のアクション」セクションを追加\n- RSS：東洋経済・Diamond・NHK政治を追加\n- タブ名を日本語化：今日のブリーフ/テーマ深掘り/企業・業界リサーチ/週次まとめ\n- SpotlightModeに業界クイックピック（日本の製造業、金融、小売等）を追加\n- デフォルトレベルを実務→エグゼクティブに変更",
+    "author": "claude"
+  },
+  {
+    "id": "1782832001283",
+    "date": "2026-06-30T15:06:41.283Z",
+    "app": "portal",
+    "content": "ポータルに開発日誌セクションを追加。\n- 日記バックエンド（diary、port 3009）を新規構築\n- GET /diary/api/entries・POST /diary/api/entries・DELETE実装\n- ポータルホームに最新3件プレビュー＋クイック入力フォームを追加\n- /diary/で全件表示・入力UIページ\n- Claude作業後に自動エントリーを記録する運用を開始",
+    "author": "claude"
+  }
+]
