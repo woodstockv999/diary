@@ -4,6 +4,7 @@ const path = require('path');
 
 const PORT = process.env.PORT || 3009;
 const DATA = path.join(__dirname, 'entries.json');
+const MEMORY_INDEX = '/home/w00dst0ck/.claude/projects/-home-w00dst0ck/memory/MEMORY.md';
 const BASE = '/diary';
 
 const app = express();
@@ -47,6 +48,23 @@ app.post(`${BASE}/api/entries`, async (req, res) => {
     return newEntry;
   });
   res.json(entry);
+});
+
+app.get(`${BASE}/api/memory-index`, (req, res) => {
+  let raw = '';
+  let mtime = null;
+  try {
+    raw = fs.readFileSync(MEMORY_INDEX, 'utf8');
+    mtime = fs.statSync(MEMORY_INDEX).mtime.toISOString();
+  } catch {
+    return res.json({ updatedAt: null, items: [] });
+  }
+  const items = [];
+  for (const line of raw.split('\n')) {
+    const m = line.match(/^- \[(.+?)\]\((.+?)\) *[—-] *(.+)$/);
+    if (m) items.push({ title: m[1], file: m[2], desc: m[3] });
+  }
+  res.json({ updatedAt: mtime, items });
 });
 
 app.delete(`${BASE}/api/entries/:id`, async (req, res) => {

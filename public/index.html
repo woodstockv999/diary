@@ -45,6 +45,24 @@
     .crumb-sep { color: var(--dim); font-size: .75rem; }
     .crumb-spacer { flex: 1; }
 
+    /* Memory index panel */
+    .memory-card {
+      background: var(--card); border: 1px solid var(--accent-b);
+      border-radius: 14px; padding: 16px 18px; margin-bottom: 20px;
+    }
+    .memory-hd {
+      display: flex; align-items: center; gap: 8px; margin-bottom: 10px;
+    }
+    .memory-title { font-size: .85rem; font-weight: 600; color: var(--accent); }
+    .memory-updated {
+      font-family: 'JetBrains Mono', monospace; font-size: .62rem;
+      color: var(--dim); margin-left: auto;
+    }
+    .memory-list { display: flex; flex-direction: column; gap: 8px; }
+    .memory-item { font-size: .8rem; line-height: 1.6; }
+    .memory-item-title { font-weight: 600; color: var(--text); }
+    .memory-item-desc { color: var(--muted); }
+
     /* Entries */
     .entries { display: flex; flex-direction: column; gap: 10px; }
     .entry {
@@ -109,6 +127,14 @@
     <span class="crumb-spacer"></span>
   </div>
   <div class="wrap">
+    <div class="memory-card">
+      <div class="memory-hd">
+        <span class="memory-title">🧠 現在の記憶（MEMORY.md）</span>
+        <span class="memory-updated" id="memoryUpdated"></span>
+      </div>
+      <div class="memory-list" id="memoryList"></div>
+    </div>
+
     <div class="filter-bar" id="filterBar"></div>
     <div class="count-lbl" id="countLbl"></div>
     <div class="entries" id="entries"><div class="empty">まだ記録がありません</div></div>
@@ -139,6 +165,16 @@
       const res = await fetch(`${BASE}/api/entries`);
       entries = await res.json();
       render();
+    }
+
+    async function loadMemoryIndex() {
+      const res = await fetch(`${BASE}/api/memory-index`);
+      const { updatedAt, items } = await res.json();
+      document.getElementById('memoryUpdated').textContent = updatedAt ? fmt(updatedAt) : '';
+      const list = document.getElementById('memoryList');
+      list.innerHTML = items.length
+        ? items.map(it => `<div class="memory-item"><span class="memory-item-title">${esc(it.title)}</span> — <span class="memory-item-desc">${esc(it.desc)}</span></div>`).join('')
+        : `<div class="memory-item memory-item-desc">まだ記憶がありません</div>`;
     }
 
     function setFilter(app) { currentFilter = app; render(); }
@@ -210,6 +246,7 @@
     };
 
     load();
+    loadMemoryIndex();
   </script>
 </body>
 </html>
