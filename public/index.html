@@ -204,10 +204,10 @@
       const counts = {};
       entries.forEach(e => { counts[e.app] = (counts[e.app] || 0) + 1; });
       const apps = Object.keys(counts).sort((a, b) => counts[b] - counts[a]);
-      const allChip = `<button class="chip ${currentFilter === null ? 'active' : ''}" onclick="setFilter(null)">すべて <span class="chip-n">${entries.length}</span></button>`;
+      const allChip = `<button class="chip ${currentFilter === null ? 'active' : ''}" data-filter="">すべて <span class="chip-n">${entries.length}</span></button>`;
       const appChips = apps.map(a => {
         const m = metaFor(a);
-        return `<button class="chip ${currentFilter === a ? 'active' : ''}" style="--c:${m.color}" onclick="setFilter('${a}')">${m.icon} ${esc(m.label)} <span class="chip-n">${counts[a]}</span></button>`;
+        return `<button class="chip ${currentFilter === a ? 'active' : ''}" style="--c:${m.color}" data-filter="${escAttr(a)}">${m.icon} ${esc(m.label)} <span class="chip-n">${counts[a]}</span></button>`;
       });
       bar.innerHTML = [allChip, ...appChips].join('');
     }
@@ -228,7 +228,7 @@
             <span class="app-badge" style="--c:${m.color}">${m.icon} ${esc(m.label)}</span>
             <span class="author-badge ${e.author === 'claude' ? 'badge-claude' : 'badge-manual'}">${e.author === 'claude' ? '🤖 Claude' : '✍️ 手入力'}</span>
             <span class="entry-date">${fmt(e.date)}</span>
-            <button class="entry-del" onclick="del('${e.id}')" title="削除">✕</button>
+            <button class="entry-del" data-id="${escAttr(e.id)}" title="削除">✕</button>
           </div>
           <div class="entry-body">${esc(e.content)}</div>
         </div>`;
@@ -257,7 +257,23 @@
       if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) addEntry();
     });
 
+    // Event delegation instead of inline onclick="" (which would need the
+    // attacker-controlled app value to be safely embedded twice: once as an
+    // HTML attribute and once as inline JS source — data-* + listener avoids that entirely).
+    document.getElementById('filterBar').addEventListener('click', e => {
+      const btn = e.target.closest('button[data-filter]');
+      if (!btn) return;
+      setFilter(btn.dataset.filter || null);
+    });
+    document.getElementById('entries').addEventListener('click', e => {
+      const btn = e.target.closest('button[data-id]');
+      if (btn) del(btn.dataset.id);
+    });
+
     const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    // For values interpolated into an HTML attribute (not just text content) — also escapes quotes,
+    // since attribute values need that even where esc() (text-node only) doesn't.
+    const escAttr = s => esc(s).replace(/"/g,'&quot;').replace(/'/g,'&#39;');
     const fmt = iso => {
       const d = new Date(iso);
       return d.toLocaleDateString('ja-JP', { timeZone: 'Asia/Tokyo', month: 'numeric', day: 'numeric' })
