@@ -45,35 +45,6 @@
     .crumb-sep { color: var(--dim); font-size: .75rem; }
     .crumb-spacer { flex: 1; }
 
-    /* Form */
-    .form-card {
-      background: var(--card); border: 1px solid var(--accent-b);
-      border-radius: 14px; padding: 18px 20px; margin-bottom: 24px;
-    }
-    .form-row { display: flex; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; }
-    select, textarea, input {
-      font-family: 'Space Grotesk', sans-serif; font-size: .85rem;
-      background: var(--surface); border: 1px solid var(--border2);
-      color: var(--text); border-radius: 7px; outline: none;
-      transition: border-color .15s;
-    }
-    select:focus, textarea:focus { border-color: var(--accent); }
-    select { padding: .45rem .75rem; cursor: pointer; }
-    .author-select { padding: .45rem .75rem; }
-    textarea {
-      width: 100%; padding: .6rem .85rem; resize: vertical;
-      min-height: 80px; line-height: 1.6;
-    }
-    .form-actions { display: flex; justify-content: flex-end; margin-top: 10px; }
-    .btn {
-      font-family: 'Space Grotesk', sans-serif; font-size: .82rem; font-weight: 600;
-      padding: .45rem 1.1rem; border-radius: 7px; border: none; cursor: pointer;
-      transition: opacity .15s;
-    }
-    .btn:hover { opacity: .85; }
-    .btn-primary { background: var(--accent); color: #08090c; }
-    .btn-ghost { background: var(--surface); border: 1px solid var(--border2); color: var(--muted); }
-
     /* Entries */
     .entries { display: flex; flex-direction: column; gap: 10px; }
     .entry {
@@ -138,32 +109,6 @@
     <span class="crumb-spacer"></span>
   </div>
   <div class="wrap">
-    <div class="form-card">
-      <div class="form-row">
-        <select id="appSel">
-          <option value="general">🗒 general</option>
-          <option value="portal">🏠 portal</option>
-          <option value="obsidian-sync">📝 obsidian-sync</option>
-          <option value="goma-monitor">🐾 goma-monitor</option>
-          <option value="marumie-jp">🔍 marumie-jp</option>
-          <option value="onepiece">🏴‍☠️ onepiece</option>
-          <option value="briefing-bot">📰 briefing-bot</option>
-          <option value="claude-usage">⚡ claude-usage</option>
-          <option value="agent-dashboard">👥 agent-dashboard</option>
-          <option value="task-manager">✅ task-manager</option>
-          <option value="deploy-infra">🛠 deploy-infra</option>
-        </select>
-        <select id="authorSel" class="author-select">
-          <option value="manual">✍️ 手入力</option>
-          <option value="claude">🤖 Claude</option>
-        </select>
-      </div>
-      <textarea id="content" placeholder="今日の作業・気づき・学び..."></textarea>
-      <div class="form-actions">
-        <button class="btn btn-primary" onclick="addEntry()">記録する</button>
-      </div>
-    </div>
-
     <div class="filter-bar" id="filterBar"></div>
     <div class="count-lbl" id="countLbl"></div>
     <div class="entries" id="entries"><div class="empty">まだ記録がありません</div></div>
@@ -235,27 +180,11 @@
       }).join('');
     }
 
-    async function addEntry() {
-      const content = document.getElementById('content').value.trim();
-      if (!content) return;
-      await fetch(`${BASE}/api/entries`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ app: document.getElementById('appSel').value, content, author: document.getElementById('authorSel').value })
-      });
-      document.getElementById('content').value = '';
-      load();
-    }
-
     async function del(id) {
       if (!confirm('削除しますか？')) return;
       await fetch(`${BASE}/api/entries/${id}`, { method: 'DELETE' });
       load();
     }
-
-    document.getElementById('content').addEventListener('keydown', e => {
-      if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) addEntry();
-    });
 
     // Event delegation instead of inline onclick="" (which would need the
     // attacker-controlled app value to be safely embedded twice: once as an
