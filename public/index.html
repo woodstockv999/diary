@@ -170,7 +170,7 @@
     async function loadMemoryIndex() {
       const res = await fetch(`${BASE}/api/memory-index`);
       const { updatedAt, items } = await res.json();
-      document.getElementById('memoryUpdated').textContent = updatedAt ? fmt(updatedAt) : '';
+      document.getElementById('memoryUpdated').textContent = updatedAt ? `最終更新日: ${fmt(updatedAt)}` : '';
       const list = document.getElementById('memoryList');
       list.innerHTML = items.length
         ? items.map(it => `<div class="memory-item"><span class="memory-item-title">${esc(it.title)}</span> — <span class="memory-item-desc">${esc(it.desc)}</span></div>`).join('')
