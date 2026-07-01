@@ -18,14 +18,32 @@
     body {
       font-family: 'Space Grotesk', sans-serif;
       background: var(--bg); color: var(--text);
-      min-height: 100vh; padding: 40px 20px 60px;
+      min-height: 100vh;
     }
-    .wrap { max-width: 640px; margin: 0 auto; }
-    .hd { display: flex; align-items: center; justify-content: space-between; margin-bottom: 32px; }
-    .hd a { font-size: .78rem; color: var(--dim); text-decoration: none; }
-    .hd a:hover { color: var(--muted); }
-    h1 { font-size: 1.3rem; font-weight: 700; letter-spacing: -.02em; }
-    .h1-sub { font-family: 'JetBrains Mono', monospace; font-size: .62rem; color: var(--dim); margin-top: 3px; }
+    .wrap { max-width: 640px; margin: 0 auto; padding: 32px 20px 60px; }
+
+    /* 階層パンくず（ポータル › アプリ名。BASEと同じ構成） */
+    .crumb-bar {
+      position: sticky; top: 0; z-index: 10;
+      display: flex; align-items: center; gap: 6px;
+      padding: 14px 24px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      font-size: .82rem;
+      flex-wrap: wrap;
+    }
+    .crumb {
+      display: flex; align-items: center; gap: 6px;
+      color: var(--muted); text-decoration: none;
+      padding: 4px 8px; border-radius: 7px;
+      transition: background .12s, color .12s;
+      background: none; border: none; font: inherit; cursor: pointer;
+    }
+    .crumb:hover { background: var(--card); color: var(--text); }
+    .crumb.current { color: var(--text); font-weight: 600; cursor: default; }
+    .crumb.current:hover { background: none; }
+    .crumb-sep { color: var(--dim); font-size: .75rem; }
+    .crumb-spacer { flex: 1; }
 
     /* Form */
     .form-card {
@@ -113,15 +131,13 @@
   </style>
 </head>
 <body>
+  <div class="crumb-bar">
+    <a class="crumb" href="/" title="アプリ一覧へ戻る">🏠 ポータル</a>
+    <span class="crumb-sep">›</span>
+    <span class="crumb current">📓 LOG</span>
+    <span class="crumb-spacer"></span>
+  </div>
   <div class="wrap">
-    <div class="hd">
-      <div>
-        <h1>開発日誌</h1>
-        <div class="h1-sub">学びと作業ログの蓄積</div>
-      </div>
-      <a href="/">← ポータルへ</a>
-    </div>
-
     <div class="form-card">
       <div class="form-row">
         <select id="appSel">
