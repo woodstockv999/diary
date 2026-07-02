@@ -31,8 +31,10 @@ app.get(`${BASE}/api/entries`, (req, res) => {
   res.json(entries.slice(0, limit));
 });
 
+const VALID_KINDS = ['trade-reflection'];
+
 app.post(`${BASE}/api/entries`, async (req, res) => {
-  const { app: appName, content, author } = req.body;
+  const { app: appName, content, author, kind } = req.body;
   if (!content?.trim()) return res.status(400).json({ error: 'content required' });
   const entry = await withWriteLock(() => {
     const entries = load();
@@ -43,6 +45,7 @@ app.post(`${BASE}/api/entries`, async (req, res) => {
       content: content.trim(),
       author: author || 'manual'
     };
+    if (VALID_KINDS.includes(kind)) newEntry.kind = kind;
     entries.unshift(newEntry);
     save(entries);
     return newEntry;

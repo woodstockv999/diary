@@ -71,7 +71,15 @@
       transition: border-color .15s;
     }
     .entry:hover { border-color: var(--border2); }
+    .entry.reflection { border-left: 3px solid #f5a623; }
     .entry-hd { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; }
+    .reflection-badge {
+      font-family: 'Space Grotesk', sans-serif; font-size: .76rem; font-weight: 600;
+      padding: 3px 10px; border-radius: 99px;
+      background: color-mix(in srgb, #f5a623 16%, transparent);
+      border: 1px solid color-mix(in srgb, #f5a623 50%, transparent);
+      color: #f5a623;
+    }
     .app-badge {
       font-family: 'Space Grotesk', sans-serif; font-size: .76rem; font-weight: 600;
       padding: 3px 10px; border-radius: 99px;
@@ -158,6 +166,7 @@
       'agent-dashboard': { label: 'agent-dashboard',  icon: '👥', color: '#c084fc' },
       'task-manager':    { label: 'task-manager',     icon: '✅', color: '#38c078' },
       'deploy-infra':    { label: 'deploy-infra',     icon: '🛠', color: '#ff9f5a' },
+      'hyperliquid-bot': { label: 'hyperliquid-bot',  icon: '📈', color: '#f5a623' },
     };
     const metaFor = app => APP_META[app] || { label: app, icon: '📦', color: '#515573' };
 
@@ -203,10 +212,12 @@
       if (!filtered.length) { el.innerHTML = `<div class="empty">${entries.length ? '該当する記録がありません' : 'まだ記録がありません'}</div>`; return; }
       el.innerHTML = filtered.map(e => {
         const m = metaFor(e.app);
+        const isReflection = e.kind === 'trade-reflection';
         return `
-        <div class="entry">
+        <div class="entry${isReflection ? ' reflection' : ''}">
           <div class="entry-hd">
             <span class="app-badge" style="--c:${m.color}">${m.icon} ${esc(m.label)}</span>
+            ${isReflection ? `<span class="reflection-badge">🔍 トレード反省</span>` : ''}
             <span class="author-badge ${e.author === 'claude' ? 'badge-claude' : 'badge-manual'}">${e.author === 'claude' ? '🤖 Claude' : '✍️ 手入力'}</span>
             <span class="entry-date">${fmt(e.date)}</span>
             <button class="entry-del" data-id="${escAttr(e.id)}" title="削除">✕</button>
