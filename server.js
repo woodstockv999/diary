@@ -26,7 +26,8 @@ function withWriteLock(fn) {
 }
 
 app.get(`${BASE}/api/entries`, (req, res) => {
-  const entries = load();
+  let entries = load();
+  if (req.query.app) entries = entries.filter(e => e.app === req.query.app);
   const limit = parseInt(req.query.limit) || 200;
   res.json(entries.slice(0, limit));
 });
